@@ -1,0 +1,12 @@
+Cardinality Information:
+- Every AREA_MANAGER supervises many DELIVERERs & each DELIVERER is managed by an AREA_MANAGER.
+- Every AREA_MANAGER can have contracts with many SHOPs while a SHOP is associated with only one contract made by AREA_MANAGER.
+- A SHOP can have different SCHEDULEs on different days whereas, a SCHEDULE can be associated with only one SHOP.
+- Every SUPER_MARKET can sell many PRODUCTs while each PRODUCT can be sold by many SUPER_MARKETs.
+- A SHOP can provide many PROMOTIONs but each PROMOTION is associated with only one SHOP.
+- Every PROMOTION can be used by many CUSTOMERs and a CUSTOMER can use many PROMOTIONs.
+- A CUSTOMER can give many comments to a SHOP but each comment is associated with a single CUSTOMER.
+- Every ORDER belongs to a SHOP and a SHOP can have many ORDERs.
+- Every DELIVERER can deliver many ORDERs but every ORDER can be associated with only one DELIVERER.
+- A CUSTOMER can place many ORDERs and each ORDER is associated with only one CUSTOMER.
+- A STAFF member can issue many SILVER_MEMBER cards whereas, each card is issued by only one STAFF member.

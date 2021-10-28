@@ -1,0 +1,13 @@
+-- Insert statements for Silver_Member Table
+
+INSERT INTO SILVER_MEMBER(SMCid, Card_No, Gold_Id, Staff_Id) VALUES ('C001', 'S00023', 'G009','E002');
+
+INSERT INTO SILVER_MEMBER(SMCid, Card_No, Staff_Id) VALUES ('C002', 'S00024', 'E002');
+
+INSERT INTO SILVER_MEMBER(SMCid, Card_No, Staff_Id) VALUES ('C003', 'S00025', 'E004');
+
+INSERT INTO SILVER_MEMBER(SMCid, Card_No, Gold_Id, Staff_Id) VALUES ('C004', 'S00026','G010','E004');
+
+INSERT INTO SILVER_MEMBER(SMCid, Card_No, Staff_Id) VALUES ('C005', 'S00027', 'E002');
+
+INSERT INTO SILVER_MEMBER(SMCid, Card_No, Staff_Id) VALUES ('C007', 'S00028', 'E004');

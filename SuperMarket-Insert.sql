@@ -1,0 +1,5 @@
+-- Insert statements for Super market Table
+
+INSERT INTO SUPERMARKET VALUES('SHOP1');
+
+INSERT INTO SUPERMARKET VALUES('SHOP4');

@@ -1,0 +1,203 @@
+-- SQL statements to create databases, tables and all other structures along with keys & constraints. 
+
+CREATE DATABASE DB_Project;
+
+-- Creates Employee Table
+CREATE TABLE EMPLOYEE (
+	Eid VARCHAR(4) PRIMARY KEY,
+	First_Name VARCHAR(50) NOT NULL,
+	Middle_Name VARCHAR(50),
+	Last_Name VARCHAR(50) NOT NULL,
+	Gender VARCHAR(30) NOT NULL,
+	Start_Date DATE NOT NULL,
+	DOB DATE NOT NULL,
+	Address VARCHAR(300),
+	Gold_Id VARCHAR(4),
+	CHECK (E_id REGEXP 'E[0-9]{3}'),
+	FOREIGN KEY(Gold_id) REFERENCES GOLD_MEMBER(Gold_id)
+);
+
+-- Trigger that checks the age limit
+DELIMITER $$
+CREATE TRIGGER age_check -- Age is at least 16
+BEFORE INSERT ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+IF DATEDIFF(CURDATE(), NEW.DOB) / 365.25 < 16 THEN
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid age';
+END IF;
+END; $$
+DELIMITER;
+
+-- Creates Phone_Number Table
+CREATE TABLE PHONE_NUMBER (
+	Eid VARCHAR(4)
+	Phone_No CHAR(10),
+	PRIMARY KEY( Eid ,Phone_No ),
+	FOREIGN KEY(Eid) REFERENCES EMPLOYEE(Eid)
+);
+
+-- Creates Area_Manager Table
+CREATE TABLE AREA_MANAGER (
+	AEid VARCHAR(4) PRIMARY KEY,
+	Area VARCHAR(50) NOT NULL,
+	FOREIGN KEY(AEid) REFERENCES EMPLOYEE(Eid),
+);
+
+-- Creates Staff Table
+CREATE TABLE STAFF (
+	SEid VARCHAR(4) PRIMARY KEY,
+	FOREIGN KEY(SEid) REFERENCES EMPLOYEE(Eid),
+);
+
+-- Creates Deliverer Table
+CREATE TABLE DELIVERER (
+	DEid VARCHAR(4) PRIMARY KEY,
+	Plate_No VARCHAR(29) NOT NULL,
+	Maker VARCHAR(20) NOT NULL,
+	Model VARCHAR(20) NOT NULL,
+	Color VARCHAR(20) NOT NULL,
+	AreaMngr_Eid VARCHAR(4) NOT NULL,
+	FOREIGN KEY(DEid) REFERENCES EMPLOYEE(Eid),
+	FOREIGN KEY(AreaMngr_Eid ) REFERENCES AREA_MANAGER(AEid)
+);
+
+-- Creates Customer Table
+CREATE TABLE CUSTOMER (
+	Cid VARCHAR(4) PRIMARY KEY,
+	First_Name VARCHAR(50) NOT NULL,
+	Middle_Name VARCHAR(50),
+	Last_Name VARCHAR(50) NOT NULL,
+	C_Type VARCHAR(50),
+	Phone_no CHAR(10) NOT NULL,
+	Address VARCHAR(300) NOT NULL
+);
+
+-- Creates Silver_Member Table
+CREATE TABLE SILVER_MEMBER (
+	SMCid VARCHAR(4) PRIMARY KEY,
+	Card_No VARCHAR(100) NOT NULL,
+	Gold_Id VARCHAR(4),
+	Staff_Id VARCHAR(4) NOT NULL,
+	FOREIGN KEY(SMCid) REFERENCES CUSTOMER(Cid),
+	FOREIGN KEY( Staff_Id ) REFERENCES STAFF(SEId),
+	FOREIGN KEY( Gold_Id ) REFERENCES GOLD_MEMBER(Gold_Id)
+);
+
+-- Creates Gold_Member Table
+CREATE TABLE GOLD_MEMBER (
+	Gold_Id VARCHAR(4) PRIMARY KEY,
+	Gold_Pass VARCHAR(30) NOT NULL,
+);
+
+-- Creates Payment Table
+CREATE TABLE PAYMENT (
+	Paymentconfirmation_No VARCHAR(100) PRIMARY KEY,
+	Payment_Time DATETIME NOT NULL,
+	Payment_Type CHAR(50) NOT NULL
+);
+
+-- Creates Schedule Table
+CREATE TABLE SCHEDULE(
+	Shop_Id VARCHAR(300),
+	Day VARCHAR(300),
+	Open_Time TIME NOT NULL,
+	Close_Time TIME NOT NULL,
+	PRIMARY KEY( Shop_Id, Day ),
+	FOREIGN KEY(Shop_Id ) REFERENCES SHOP(Shop_Id)
+);
+
+-- Creates Shop Table
+CREATE TABLE SHOP(
+	Shop_Id VARCHAR(300) PRIMARY KEY,
+	Name VARCHAR(100) NOT NULL,
+	Address VARCHAR(300) NOT NULL,
+	Business_Phone CHAR(10) NOT NULL,
+	Area VARCHAR(30) NOT NULL,
+	AreaMngr_Eid VARCHAR(4) NOT NULL,
+	Start_Time DATE NOT NULL,
+	FOREIGN KEY(AreaMngr_Eid ) REFERENCES AREA_MANAGER(AEid)
+);
+
+-- Creates Restaurant Table
+CREATE TABLE RESTAURANT (
+	Shop_Id VARCHAR(300) PRIMARY KEY,
+	FOREIGN KEY( Shop_Id) REFERENCES SHOP( Shop_Id)
+);
+
+-- Creates Supermarket Table
+CREATE TABLE SUPERMARKET (
+	Shop_Id VARCHAR(300) PRIMARY KEY,
+	FOREIGN KEY( Shop_Id) REFERENCES SHOP( Shop_Id)
+);
+
+-- Creates Restaurant_Type Table
+CREATE TABLE RESTAURANT_TYPE (
+	Shop_Id VARCHAR(300),
+	Type VARCHAR(100),
+	PRIMARY KEY(Shop_Id, Type),
+	FOREIGN KEY( Shop_Id) REFERENCES RESTAURANT( Shop_Id)
+);
+
+-- Creates Promotion Table
+CREATE TABLE PROMOTION (
+	Shop_Id VARCHAR(300),
+	Promo_Code VARCHAR(100),
+	Description VARCHAR(100) NOT NULL,
+	PRIMARY KEY(Shop_Id, Promo_Code),
+	FOREIGN KEY( Shop_Id) REFERENCES SHOP( Shop_Id)
+);
+
+-- Creates Product Table
+CREATE TABLE PRODUCT (
+	Product_Name VARCHAR(100) PRIMARY KEY,
+	Stock_Availability VARCHAR(100) NOT NULL
+);
+
+-- Creates Sells Table
+CREATE TABLE SELLS (
+	Shop_Id VARCHAR(4),
+	P_Name VARCHAR(300),
+	Price VARCHAR(300) NOT NULL,
+	PRIMARY KEY( Shop_Id, P_Name ),
+	FOREIGN KEY( Shop_Id) REFERENCES SUPERMARKET( Shop_Id),
+	FOREIGN KEY(P_Name) REFERENCES PRODUCT( Product_Name)
+);
+
+-- Creates Comments Table
+CREATE TABLE COMMENTS (
+	Shop_Id VARCHAR(300),
+	Cid VARCHAR(4),
+	Rating VARCHAR(300) NOT NULL,
+	Comment VARCHAR(300) NOT NULL,
+	PRIMARY KEY( Shop_Id ,Cid ),
+	FOREIGN KEY( Shop_Id) REFERENCES SHOP( Shop_Id),
+	FOREIGN KEY(Cid) REFERENCES CUSTOMER (Cid)
+);
+
+-- Creates Orders Table
+CREATE TABLE ORDERS (
+	Cust_Id VARCHAR(4),
+	Oid VARCHAR(300),
+	Total_Balance CHAR(10) NOT NULL,
+	Deliverer_Id VARCHAR(4) NOT NULL,
+	PaymentConf_No VARCHAR(300) NOT NULL,
+	Shop_Id VARCHAR(300) NOT NULL,
+	PromoShop_Id VARCHAR(300) NOT NULL,
+	PromoCode VARCHAR(300) NOT NULL,
+	PRIMARY KEY(Cust_Id ,Oid),
+	FOREIGN KEY( Deliverer_Id) REFERENCES DELIVERER(DEid),
+	FOREIGN KEY(Cust_id) REFERENCES CUSTOMER (Cid),
+	FOREIGN KEY(Shop_Id) REFERENCES SHOP(Shop_Id),
+	FOREIGN KEY(PaymentConf_No) REFERENCES PAYMENT(Paymentconfirmation_No),
+	FOREIGN KEY(PromoShop_Id,PromoCode) REFERENCES PROMOTION(Shop_Id,Promo_Code)
+);
+
+-- Creates Order_Items Table
+CREATE TABLE ORDER_ITEMS (
+	Cid VARCHAR(4),
+	Oid VARCHAR(300),
+	Order_ITEMS VARCHAR(300) NOT NULL,
+	PRIMARY KEY(CId ,Oid, Order_Items ),
+	FOREIGN KEY(Cid,Oid) REFERENCES ORDERS(Cust_Id,Oid)
+);
